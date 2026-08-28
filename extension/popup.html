@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PhishGuard</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <h1>PhishGuard</h1>
+        </div>
+        
+        <div class="domain-box">
+            <span id="domain-name">Loading...</span>
+        </div>
+
+        <div id="status-card" class="status-card checking">
+            <h2 id="status-title">Checking...</h2>
+            <p id="status-desc">Analyzing webpage features.</p>
+        </div>
+
+        <div class="confidence-section">
+            <div class="confidence-label">
+                <span>XGBoost</span>
+                <span id="xgb-value">--%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="xgb-fill" class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="confidence-section" style="margin-top: 10px;">
+            <div class="confidence-label">
+                <span>Random Forest</span>
+                <span id="rf-value">--%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="rf-fill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="privacy-section">
+            <h3>Privacy Monitor</h3>
+            <ul class="privacy-list">
+                <li id="pw-status" class="inactive">Password field detected</li>
+                <li id="email-status" class="inactive">Email field detected</li>
+                <li id="payment-status" class="inactive">Payment field detected</li>
+            </ul>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+body {
+    width: 350px;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.shield-icon {
+    width: 24px;
+    height: 24px;
+    color: #2563eb;
+}
+
+h1 {
+    font-size: 18px;
+    margin: 0;
+    font-weight: 700;
+}
+
+.domain-box {
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 13px;
+    word-break: break-all;
+    color: #4b5563;
+}
+
+.status-card {
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.status-card h2 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+}
+
+.status-card p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Status variants */
+.checking {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+}
+
+.safe {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.phishing {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.confidence-section {
+    margin-bottom: 20px;
+}
+
+.confidence-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #2563eb;
+    transition: width 0.5s ease;
+}
+
+.privacy-section {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.privacy-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.privacy-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.privacy-list li {
+    font-size: 12px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #111827;
+}
+
+.privacy-list li::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.privacy-list li.inactive {
+    color: #9ca3af;
+}
+
+.privacy-list li.inactive::before {
+    background: #d1d5db;
+}
+
+.privacy-list li.active::before {
+    background: #f59e0b;
+}

@@ -1,0 +1,18 @@
+# Environments
+backend/venv/
+backend/__pycache__/
+training/__pycache__/
+Framework/__pycache__/
+__pycache__/
+
+# Large datasets
+Datasets/*.csv
+Datasets/*.dill
+
+# Compiled models
+models/*.pkl
+Framework/phishguard_models/*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db

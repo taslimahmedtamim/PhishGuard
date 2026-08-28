@@ -1,0 +1,12 @@
+Flask
+Flask-Cors
+xgboost
+scikit-learn
+pandas
+beautifulsoup4
+python-whois
+requests
+numpy
+shap
+matplotlib
+seaborn
