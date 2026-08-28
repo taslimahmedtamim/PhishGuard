@@ -26,7 +26,11 @@ PhishGuard is an end-to-end local phishing detection system built for research a
 This repository has been upgraded to support the 1.56 million URL dataset (`vonDataset20180426.dill`).
 
 ### 1. Dataset Installation
-Ensure `vonDataset20180426.dill` is placed inside the `Datasets/` directory. 
+To run the training script yourself, you must first download the massive 1.56 million URL dataset, as it is too large to host on GitHub. 
+
+**[Download vonDataset20180426.dill from Google Drive here](https://drive.google.com/drive/folders/1E0I36is_IpHWNDgW9SEU64v3RPLiCRqz?usp=drive_link)**
+
+Once downloaded, ensure `vonDataset20180426.dill` is placed inside the `Datasets/` directory. 
 
 ### 2. Inspect Dataset Shapes
 You can inspect the `.dill` arrays by running any custom inspection scripts locally, but the provided training script will automatically decode the `train_x` and `test_x` character mappings.
