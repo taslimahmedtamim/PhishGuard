@@ -19,4 +19,4 @@ This explains why real-world performance or exact replications of the paper's RO
 
 ## 3. Real-Time Feature Extraction Constraints
 Some features described in the research paper rely on exhaustive WHOIS or SSL analysis which can take significant time or may fail due to rate-limiting in a real-world real-time setting. 
-To ensure the backend doesn't hang indefinitely, the `FeatureExtractor` sets a 5-second timeout and gracefully falls back to default "safe/unknown" values if extraction fails. This design prioritizes latency and reliability over exhaustive extraction.
+To ensure the backend doesn't hang indefinitely, the system extracts **WHOIS and SSL information solely as supplementary security context for the user interface**. These features are **not** fed into the Machine Learning model. The ML model relies exclusively on 15 instantaneous Lexical features to guarantee sub-second prediction latency.

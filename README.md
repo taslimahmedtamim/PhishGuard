@@ -4,10 +4,14 @@ PhishGuard is an end-to-end local phishing detection system built for research a
 
 ## Project Architecture
 
-1. **Chrome Extension**: Monitors browsing activity and requests predictions for new URLs. Detects privacy-sensitive fields.
-2. **Flask API Backend**: Exposes endpoints (`/predict`, `/health`) to receive URLs.
-3. **Feature Extractor**: Performs real-time WHOIS, SSL, and HTTP requests to extract features matching the trained model's requirements.
-4. **Machine Learning Model**: Uses the trained model (`combined_model.pkl`) to infer whether a URL is Legitimate or Phishing.
+The system provides a unified risk assessment by combining Machine Learning predictions with real-time heuristic security context:
+
+1. **Chrome Extension**: Monitors browsing activity, detects privacy-sensitive inputs (passwords, emails), and monitors third-party cookies.
+2. **Flask API Backend**: Exposes endpoints (`/predict`, `/health`) to receive URLs for real-time analysis.
+3. **Feature Extraction (ML Inputs)**: Extracts 15 **Lexical Features** directly from the URL structure. These are the *only* features fed into the Machine Learning model.
+4. **Machine Learning Model**: Uses a pre-trained Random Forest (and XGBoost) model (trained on 1.25 million URLs) to infer whether a URL is Legitimate or Phishing based purely on the lexical inputs.
+5. **Additional Security Context (Non-ML)**: Performs real-time WHOIS lookups (domain age, registrar) and SSL certificate extraction. These features are *not* used by the ML model, but are appended to the backend response as supplementary context.
+6. **Popup UI**: Presents a unified dashboard combining the ML phishing prediction, WHOIS/domain information, SSL security info, URL analysis, and extension-level privacy monitoring.
 
 ## Repository Structure
 

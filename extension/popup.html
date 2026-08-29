@@ -21,37 +21,45 @@
 
         <div id="status-card" class="status-card checking">
             <h2 id="status-title">Checking...</h2>
-            <p id="status-desc">Analyzing webpage features.</p>
+            <div id="risk-level-container" style="display: none; margin-top: 5px;">
+                <strong>Risk Level: </strong><span id="risk-level"></span>
+            </div>
+            <div id="model-score-container" style="display: none; margin-top: 5px;">
+                <strong>Model Score: </strong><span id="model-score"></span>
+            </div>
+            <p id="status-desc" style="margin-top: 10px;">Analyzing webpage features.</p>
         </div>
 
-        <div class="confidence-section">
-            <div class="confidence-label">
-                <span>XGBoost</span>
-                <span id="xgb-value">--%</span>
-            </div>
-            <div class="progress-bar">
-                <div id="xgb-fill" class="progress-fill"></div>
-            </div>
-        </div>
-        
-        <div class="confidence-section" style="margin-top: 10px;">
-            <div class="confidence-label">
-                <span>Random Forest</span>
-                <span id="rf-value">--%</span>
-            </div>
-            <div class="progress-bar">
-                <div id="rf-fill" class="progress-fill"></div>
-            </div>
-        </div>
-
-        <div class="privacy-section">
-            <h3>Privacy Monitor</h3>
-            <ul class="privacy-list">
-                <li id="pw-status" class="inactive">Password field detected</li>
-                <li id="email-status" class="inactive">Email field detected</li>
-                <li id="payment-status" class="inactive">Payment field detected</li>
+        <div class="details-section">
+            <h3>Security Analysis</h3>
+            <ul class="analysis-list">
+                <li id="sa-url">URL structure: <span id="sa-url-val">Analyzing</span></li>
+                <li id="sa-https">HTTPS: <span id="sa-https-val">Analyzing</span></li>
+                <li id="sa-ip">Suspicious IP: <span id="sa-ip-val">Analyzing</span></li>
+                <li id="sa-whois">Domain Age: <span id="sa-whois-val">Analyzing</span></li>
             </ul>
         </div>
+        
+        <div class="privacy-section" style="margin-top: 15px;">
+            <h3>Data Collection Detected</h3>
+            <ul class="privacy-list">
+                <li>Password field: <span id="pw-status" class="inactive">No</span></li>
+                <li>Email field: <span id="email-status" class="inactive">No</span></li>
+                <li>Third-party activity: <span id="cookie-status" class="inactive">None detected</span></li>
+            </ul>
+        </div>
+        
+        <!-- Detailed View Toggle -->
+        <details style="margin-top: 15px; cursor: pointer; font-size: 12px; color: #555;">
+            <summary>View Details</summary>
+            <div style="margin-top: 10px; background: #f5f5f5; padding: 10px; border-radius: 4px;">
+                <p><strong>URL Length: </strong><span id="det-url-len">-</span></p>
+                <p><strong>Path Length: </strong><span id="det-path-len">-</span></p>
+                <p><strong>Num Dots: </strong><span id="det-dots">-</span></p>
+                <p><strong>Entropy: </strong><span id="det-entropy">-</span></p>
+                <p><strong>Cert Issuer: </strong><span id="det-cert">-</span></p>
+            </div>
+        </details>
     </div>
     <script src="popup.js"></script>
 </body>

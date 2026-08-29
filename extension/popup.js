@@ -20,68 +20,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result[currentTabId]) {
                     updateUI(result[currentTabId]);
                 } else {
-                    // Fallback to fetch manually if background didn't catch it
-                    analyzeManual(tab.url);
+                    updateUIError("Analyzing URL...");
                 }
             });
         }
     });
 });
 
-async function analyzeManual(url) {
-    if (!url.startsWith('http')) {
-        updateUIError("Extension cannot analyze this page.");
-        return;
-    }
-    try {
-        const res = await fetch('http://127.0.0.1:5000/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-        });
-        
-        if (res.ok) {
-            const data = await res.json();
-            updateUI(data);
-            chrome.storage.local.set({ [currentTabId]: data });
-        } else {
-            updateUIError("Backend server is not reachable.");
-        }
-    } catch (e) {
-        updateUIError("Failed to connect to PhishGuard backend.");
-    }
-}
-
 function updateUI(data) {
     const statusCard = document.getElementById('status-card');
     const statusTitle = document.getElementById('status-title');
     const statusDesc = document.getElementById('status-desc');
-    const xgbValue = document.getElementById('xgb-value');
-    const xgbFill = document.getElementById('xgb-fill');
-    const rfValue = document.getElementById('rf-value');
-    const rfFill = document.getElementById('rf-fill');
+    
+    document.getElementById('risk-level-container').style.display = 'block';
+    document.getElementById('model-score-container').style.display = 'block';
+    
+    document.getElementById('risk-level').textContent = data.risk_level || 'UNKNOWN';
+    if (data.risk_score !== undefined) {
+        document.getElementById('model-score').textContent = (data.risk_score * 100).toFixed(1) + '%';
+    } else {
+        document.getElementById('model-score').textContent = 'N/A';
+    }
 
     statusCard.className = 'status-card';
     
-    if (data.is_phishing) {
-        statusCard.classList.add('phishing');
-        statusTitle.textContent = '⚠ PHISHING';
-        statusDesc.innerHTML = 'This website may be dangerous.<br><br>Avoid entering passwords, banking information, or other sensitive information.';
-    } else {
-        statusCard.classList.add('safe');
-        statusTitle.textContent = 'SAFE';
-        statusDesc.textContent = 'This website appears to be legitimate.';
+    if (data.error && data.risk_level === 'UNKNOWN') {
+        updateUIError(data.message || "Analysis incomplete.");
+        return;
     }
 
-    const xgbPerc = (data.xgb_confidence * 100).toFixed(1);
-    xgbValue.textContent = `${xgbPerc}%`;
-    xgbFill.style.width = `${xgbPerc}%`;
-    xgbFill.style.background = data.xgb_is_phishing ? '#dc2626' : '#10b981';
+    if (data.is_phishing || data.risk_level === 'HIGH') {
+        statusCard.classList.add('phishing');
+        statusTitle.textContent = '🔴 PHISHING';
+        statusDesc.innerHTML = '⚠️ ' + (data.message || 'Potential phishing website detected.') + '<br><br><strong>Do not enter sensitive information.</strong>';
+    } else {
+        statusCard.classList.add('safe');
+        statusTitle.textContent = '🟢 SAFE';
+        statusDesc.textContent = data.message || 'Website appears legitimate based on analysis.';
+    }
+
+    // Update Security Analysis Details
+    if (data.features) {
+        document.getElementById('sa-url-val').textContent = data.features.url_length > 100 ? 'Suspiciously Long' : 'Normal';
+        document.getElementById('sa-https-val').textContent = data.features.contains_https ? 'Enabled' : 'No';
+        document.getElementById('sa-ip-val').textContent = data.features.contains_ip ? 'Yes' : 'No';
+        
+        if (data.features.whois_available) {
+            document.getElementById('sa-whois-val').textContent = data.features.domain_age_days ? `${data.features.domain_age_days} days` : 'Available';
+        } else {
+            document.getElementById('sa-whois-val').textContent = 'Unavailable';
+        }
+
+        // Detailed View
+        document.getElementById('det-url-len').textContent = data.features.url_length || '-';
+        document.getElementById('det-path-len').textContent = data.features.path_length || '-';
+        document.getElementById('det-dots').textContent = data.features.num_dots || '-';
+        document.getElementById('det-entropy').textContent = data.features.entropy ? data.features.entropy.toFixed(2) : '-';
+        document.getElementById('det-cert').textContent = data.features.cert_issuer || 'Unknown';
+    }
+
+    // Update Privacy Monitor Details (from Extension Data)
+    if (data.sensitive_fields) {
+        document.getElementById('pw-status').textContent = data.sensitive_fields.hasPassword ? 'YES' : 'No';
+        document.getElementById('pw-status').className = data.sensitive_fields.hasPassword ? 'active' : 'inactive';
+        
+        document.getElementById('email-status').textContent = data.sensitive_fields.hasEmail ? 'YES' : 'No';
+        document.getElementById('email-status').className = data.sensitive_fields.hasEmail ? 'active' : 'inactive';
+    }
     
-    const rfPerc = (data.rf_confidence * 100).toFixed(1);
-    rfValue.textContent = `${rfPerc}%`;
-    rfFill.style.width = `${rfPerc}%`;
-    rfFill.style.background = data.rf_is_phishing ? '#dc2626' : '#10b981';
+    if (data.has_third_party_cookies !== undefined) {
+        document.getElementById('cookie-status').textContent = data.has_third_party_cookies ? 'Detected' : 'None detected';
+        document.getElementById('cookie-status').className = data.has_third_party_cookies ? 'active' : 'inactive';
+    }
 }
 
 function updateUIError(msg) {
@@ -89,23 +99,17 @@ function updateUIError(msg) {
     const statusTitle = document.getElementById('status-title');
     const statusDesc = document.getElementById('status-desc');
     
+    document.getElementById('risk-level-container').style.display = 'none';
+    document.getElementById('model-score-container').style.display = 'none';
+    
     statusCard.className = 'status-card checking';
-    statusTitle.textContent = 'ERROR';
+    statusTitle.textContent = 'UNKNOWN';
     statusDesc.textContent = msg;
 }
 
-// Listen for privacy monitor messages
-chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "SENSITIVE_FIELDS_DETECTED") {
-        const data = message.data;
-        if (data.hasPassword) {
-            document.getElementById('pw-status').className = 'active';
-        }
-        if (data.hasEmail) {
-            document.getElementById('email-status').className = 'active';
-        }
-        if (data.hasPayment) {
-            document.getElementById('payment-status').className = 'active';
-        }
+// Listen for dynamic updates (e.g. if background script finishes while popup is open)
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes[currentTabId.toString()]) {
+        updateUI(changes[currentTabId.toString()].newValue);
     }
 });

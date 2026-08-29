@@ -56,7 +56,7 @@ def predict():
     
     try:
         # Extract features
-        features, available_groups = feature_service.extract(url)
+        lexical_features, host_features, available_groups = feature_service.extract(url)
         
         if not available_groups:
             logger.warning(f"Could not extract features for URL: {url}")
@@ -64,29 +64,49 @@ def predict():
                 "url": url,
                 "prediction": "legitimate",
                 "is_phishing": False,
-                "confidence": 0.50,
-                "error": "Feature extraction failed; defaulting to safe"
+                "risk_score": 0.50,
+                "risk_level": "UNKNOWN",
+                "message": "Analysis incomplete or failed; defaulting to safe",
+                "error": "Feature extraction failed"
             }), 200
             
-        # Predict
-        result = model_service.predict(features)
+        # Predict using ONLY the lexical features as expected by the model
+        result = model_service.predict(lexical_features)
         
         if "error" in result:
             logger.error(f"Prediction error for {url}: {result['error']}")
             return jsonify({"error": "Prediction failed", "details": result['error']}), 500
             
+        # Determine risk level and message (Primarily relying on Random Forest)
+        is_phishing = result.get("rf_is_phishing", False)
+        risk_score = result.get("rf_confidence", 0.0)
+        
+        if is_phishing:
+            risk_level = "HIGH"
+            message = "Potential phishing website detected"
+        else:
+            if risk_score > 0.8: # If not phishing but high confidence of safe
+                risk_level = "LOW"
+                message = "Website appears safe based on analysis"
+            else:
+                risk_level = "MEDIUM"
+                message = "Website has some suspicious characteristics"
+                
+        # Merge all features for the UI
+        all_features = {**lexical_features, **host_features}
+            
         response = {
             "url": url,
-            "prediction": result["prediction"],
-            "is_phishing": result["is_phishing"],
-            "xgb_is_phishing": result["xgb_is_phishing"],
-            "xgb_confidence": result["xgb_confidence"],
-            "rf_is_phishing": result["rf_is_phishing"],
-            "rf_confidence": result["rf_confidence"],
-            "available_features": available_groups
+            "prediction": "phishing" if is_phishing else "legitimate",
+            "is_phishing": is_phishing,
+            "risk_score": risk_score,
+            "risk_level": risk_level,
+            "message": message,
+            "features": all_features,
+            "available_groups": available_groups
         }
         
-        logger.info(f"Result for {url}: XGBoost {result['xgb_confidence']:.2f}, RF {result['rf_confidence']:.2f}")
+        logger.info(f"Result for {url}: {risk_level} Risk ({risk_score:.2f})")
         return jsonify(response), 200
         
     except Exception as e:
